@@ -34,7 +34,7 @@
 ## 📖 用法
 暂无文档，请参考 `demo.py`。
 ## ✅ 支持的型号
-> 你可以通过 [token extractor](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) 或 `[miiocli](https://github.com/rytilahti/python-miio) device --ip <ip_address> --token <token> info` 以确定你的设备的型号。
+> 你可以通过 [token extractor](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) 或 [`miiocli device --ip <ip_address> --token <token> info`](https://github.com/rytilahti/python-miio) 以确定你的设备的型号。
 * `xiaomi.wifispeaker.v3`
 ## ⚠️ 注意事项
 暂无。
