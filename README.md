@@ -7,7 +7,7 @@ Control Xiaomi wifispeaker to play local musics🎵.
 Ensure your computer and wifispeaker are **under the same LAN**, input `\\<ip>` on the address bar of explorer, where `<ip>` ip refers to the ip address of your wifispeaker, and press enter to access. If you encounter an error, you can try to [enable SMBv1 client](https://docs.microsoft.com/en-us/windows-server/storage/file-server/troubleshoot/detect-enable-and-disable-smbv1-v2-v3#smbv1-on-smb-client), although it's [not recommend to do so](https://techcommunity.microsoft.com/t5/storage-at-microsoft/stop-using-smb1/ba-p/425858).
 ### 🤔 Other systems
 Ensure your computer and wifispeaker are **under the same LAN**, and use a SMB client to connect to your wifispeaker. If a username is required, use `GUEST`, and leave the password blank. You may also need to enable SMB(v)1 somewhere.
-## 🍪 Acquiring cookie
+## 🍪 Acquiring cookies
 > A script *may* be developed to simplify this process.
 1. Ensure you **can capture https traffic on your phone/emulator**, even when apps don't trust user certificates.*(Emulator of Android 6 and below, together with Fiddler is recommended)*
 2. Install "小爱音箱" APP (`com.xiaomi.mico`).
@@ -34,7 +34,7 @@ Ensure your computer and wifispeaker are **under the same LAN**, and use a SMB c
 ## 📖 Usage
 No documentations yet. Please refer to `demo.py`.
 ## ✅ Supported models
-> You can use [token extractor](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) or `[miiocli](https://github.com/rytilahti/python-miio) device --ip <ip_address> --token <token> info` to determine the model of your wifispeaker.
+> You can use [token extractor](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) or [`miiocli device --ip <ip_address> --token <token> info`](https://github.com/rytilahti/python-miio) to determine the model of your wifispeaker.
 * `xiaomi.wifispeaker.v3`
 ## ⚠️ Attention
 Noting here yet.
