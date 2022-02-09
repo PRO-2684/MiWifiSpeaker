@@ -100,6 +100,39 @@ class WifiSpeakerV3:
         ).json()
         return r["code"] == 0 and r["data"]["code"] == 0
 
+    def set_volume(self, volume: int) -> bool:
+        """Set device volume."""
+        r = self._session.post(
+            URL,
+            params={
+                "deviceId": self.device_id,
+                "path": "mediaplayer",
+                "method": "player_set_volume",
+                "message": f'{{"volume":{volume},"media":"app_android"}}',
+                "requestId": generate_request_id(),
+            },
+        ).json()
+        return r["code"] == 0 and r["data"]["code"] == 0
+
+    def set_position(self, position: int) -> bool:
+        """Set song position. Unit: milliseconds(ms)."""
+        status = self.status
+        assert (
+            position >= 0 and position <= status.duration
+        ), f"Position must be between 0 and duration({status.duration})."
+        r = self._session.post(
+            URL,
+            params={
+                "deviceId": self.device_id,
+                "path": "mediaplayer",
+                # "method": "player_set_position",
+                "method": "player_set_positon",  # ?????
+                "message": f'{{"position":{position},"media":"app_android"}}',
+                "requestId": generate_request_id(),
+            },
+        ).json()
+        return r["code"] == 0 and r["data"]["code"] == 0
+
 
 class WifiSpeakerV3Status:
     """Main class representing `xiaomi.wifispeaker.v3` status."""
@@ -107,12 +140,14 @@ class WifiSpeakerV3Status:
     def __init__(self, info: dict):
         self._info = info
         self.play_status = PlayStatus(info["status"])
-        self.volume = info["volume"]
         self.loop_type = LoopType(info["loop_type"])
+        self.volume = info["volume"]
+        self.duration = info["play_song_detail"]["duration"]
+        self.position = info["play_song_detail"]["position"]
         self.song_path = info["play_song_detail"]["title"][21:]
 
     def __str__(self):
-        return f'<{self.__class__.__name__}: play_status={self.play_status} loop_type={self.loop_type} volumn={self.volume} song_path="{self.song_path}">'
+        return f'<{self.__class__.__name__}: play_status={self.play_status} loop_type={self.loop_type} volumn={self.volume}% duration={self.duration}ms position={self.position}ms song_path="{self.song_path}">'
 
 
 class PlayStatus(Enum):
