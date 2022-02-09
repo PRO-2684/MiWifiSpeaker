@@ -38,3 +38,5 @@ No documentations yet. Please refer to `demo.py`.
 * `xiaomi.wifispeaker.v3`
 ## ⚠️ Attention
 Noting here yet.
+## 🗒️ Todo
+* [ ] Add `set_loop_type`.

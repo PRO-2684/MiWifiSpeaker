@@ -38,3 +38,5 @@
 * `xiaomi.wifispeaker.v3`
 ## ⚠️ 注意事项
 暂无。
+## 🗒️ Todo
+* [ ] 添加 `set_loop_type`。      
