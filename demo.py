@@ -1,4 +1,4 @@
-from MiWifispeakerV3 import WifiSpeakerV3
+from MiWifiSpeakerV3 import WifiSpeakerV3
 
 my_cookie = {
     "userId": "2574549865",
