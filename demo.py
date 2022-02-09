@@ -1,4 +1,5 @@
 from MiWifiSpeakerV3 import WifiSpeakerV3
+from time import sleep
 
 my_cookie = {
     "userId": "2574549865",
@@ -9,3 +10,51 @@ my_cookie = {
 }
 wifi_speaker = WifiSpeakerV3(my_cookie)
 print(wifi_speaker.status)
+music = "Afterglow.mp3"
+if wifi_speaker.play(music):
+    print(f'Play "{music}" success!')
+else:
+    print(f'Failed to play "{music}".')
+sleep(5)
+status = wifi_speaker.status
+print(
+    f"""Status: "{status.song_path}" {status.play_status.name}
+Loop: {status.loop_type.name}
+Volume: {status.volume}%
+Progress: {status.position / status.duration:.2f}%"""
+)
+wifi_speaker.set_volume(10)
+if wifi_speaker.pause():
+    print("Pause success!")
+else:
+    print("Failed to pause.")
+status = wifi_speaker.status
+print(
+    f"""Status: "{status.song_path}" {status.play_status.name}
+Loop: {status.loop_type.name}
+Volume: {status.volume}%
+Progress: {status.position / status.duration:.2f}%"""
+)
+print("Sleeping...")
+sleep(5)
+if wifi_speaker.play():
+    print("Resumn success!")
+else:
+    print("Failed to resume.")
+sleep(5)
+status = wifi_speaker.status
+if wifi_speaker.set_position(int(0.5 * status.duration)):
+    print("Set position success!")
+else:
+    print("Failed to set position.")
+sleep(5)
+status = wifi_speaker.status
+print(
+    f"""Status: "{status.song_path}" {status.play_status.name}
+Loop: {status.loop_type.name}
+Volume: {status.volume}%
+Progress: {status.position / status.duration:.2f}%"""
+)
+print("Pausing...")
+sleep(5)
+wifi_speaker.pause()
