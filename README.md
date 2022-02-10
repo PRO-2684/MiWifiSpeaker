@@ -40,3 +40,4 @@ No documentations yet. Please refer to `demo.py`.
 Noting here yet.
 ## 🗒️ Todo
 * [ ] Add `set_loop_type`.
+* [ ] Add playlists.
