@@ -8,6 +8,7 @@ from typing import Union
 
 URL = "https://api2.mina.mi.com/remote/ubus"
 STRING = ascii_letters + digits
+RETRY = 3
 
 
 def generate_request_id():
@@ -62,11 +63,21 @@ class WifiSpeakerV3:
         }
         self._session.cookies.update(cookie)
         self.device_id = cookie["deviceId"]
-
+    def _post(self, *args, **kwargs):
+        flag = False
+        for _ in range(RETRY):
+            try:
+                r = self._session.post(*args, **kwargs)
+            except:
+                pass
+            finally:
+                flag = True
+        assert flag, f'Post failed after {RETRY} retries.'
+        return r
     @property
     def status(self) -> WifiSpeakerV3Status:
         """Get current status."""
-        r = self._session.post(
+        r = self._post(
             URL,
             params={
                 "deviceId": self.device_id,
@@ -80,7 +91,7 @@ class WifiSpeakerV3:
         assert data["code"] == 0 and data["data"]["code"] == 0, (
             "Failed to fetch device status. Response: " + r.text
         )
-        r = self._session.post(
+        r = self._post(
             URL,
             params={
                 "deviceId": self.device_id,
@@ -101,7 +112,7 @@ class WifiSpeakerV3:
     def play(self, local_path: str = "") -> bool:
         """Plays the given song at `local_path`. If `local_path` is empty, the song previously played is resumed."""
         if not local_path:
-            r = self._session.post(
+            r = self._post(
                 URL,
                 params={
                     "deviceId": self.device_id,
@@ -118,7 +129,7 @@ class WifiSpeakerV3:
             local_path = local_path[1:]
         elif not local_path.startswith("/"):
             local_path = "/" + local_path
-        r = self._session.post(
+        r = self._post(
             URL,
             params={
                 "deviceId": self.device_id,
@@ -132,7 +143,7 @@ class WifiSpeakerV3:
 
     def pause(self) -> bool:
         """Pause the song currently playing."""
-        r = self._session.post(
+        r = self._post(
             URL,
             params={
                 "deviceId": self.device_id,
@@ -148,7 +159,7 @@ class WifiSpeakerV3:
         """Set device volume. `volumn` should be between 1 and 100.  
         Unit: percentage(%)."""
         assert 1 <= volume <= 100, "Volume should be between 1 and 100."
-        r = self._session.post(
+        r = self._post(
             URL,
             params={
                 "deviceId": self.device_id,
@@ -167,7 +178,7 @@ class WifiSpeakerV3:
         assert (
             position >= 0 and position <= status.duration
         ), f"Position must be between 0 and duration({status.duration})."
-        r = self._session.post(
+        r = self._post(
             URL,
             params={
                 "deviceId": self.device_id,
@@ -182,7 +193,7 @@ class WifiSpeakerV3:
 
     def set_loop_type(self, loop_type: Union[LoopType, int]) -> bool:
         """Set loop type."""
-        r = self._session.post(
+        r = self._post(
             URL,
             params={
                 "deviceId": self.device_id,
@@ -198,7 +209,7 @@ class WifiSpeakerV3:
         """After `seconds`, pause the music. If `seconds == 0`, cancel the timer.  
         Unit: seconds(s)."""
         if seconds > 0:
-            r = self._session.post(
+            r = self._post(
                 URL,
                 params={
                     "deviceId": self.device_id,
@@ -210,7 +221,7 @@ class WifiSpeakerV3:
             ).json()
             return r["code"] == 0 and r["data"]["code"] == 0
         elif seconds == 0:
-            r = self._session.post(
+            r = self._post(
                 URL,
                 params={
                     "deviceId": self.device_id,
