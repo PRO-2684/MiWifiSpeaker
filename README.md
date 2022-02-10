@@ -39,5 +39,5 @@ No documentations yet. Please refer to `demo.py`.
 ## ⚠️ Attention
 Noting here yet.
 ## 🗒️ Todo
-* [ ] Add `set_loop_type`.
-* [ ] Add playlists.
+* [x] Add `set_loop_type`.
+* [ ] Add playlist.

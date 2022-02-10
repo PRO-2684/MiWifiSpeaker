@@ -39,5 +39,5 @@
 ## ⚠️ 注意事项
 暂无。
 ## 🗒️ Todo
-* [ ] 添加 `set_loop_type`。
+* [x] 添加 `set_loop_type`。
 * [ ] 添加播放列表。
