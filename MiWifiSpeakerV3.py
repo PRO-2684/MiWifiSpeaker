@@ -224,3 +224,5 @@ class WifiSpeakerV3:
                 },
             ).json()
             return r["code"] == 0 and r["data"]["code"] == 0
+        else:
+            return False
