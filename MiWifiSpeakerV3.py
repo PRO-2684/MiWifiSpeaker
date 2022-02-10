@@ -50,7 +50,7 @@ class WifiSpeakerV3Status:
 class WifiSpeakerV3:
     """Main class representing `xiaomi.wifispeaker.v3` device."""
 
-    def __init__(self, cookie: dict, local_ip: str = None) -> None:
+    def __init__(self, cookie: dict) -> None:
         """`cookie` should contain `userId`, `deviceSNProfile`, `sn`, `deviceId` and `serviceToken`.
 
         `local_ip` is needed for listing directories."""
@@ -64,7 +64,6 @@ class WifiSpeakerV3:
         }
         self._session.cookies.update(cookie)
         self.device_id = cookie["deviceId"]
-        self.local_ip = local_ip
 
     @property
     def status(self) -> WifiSpeakerV3Status:
