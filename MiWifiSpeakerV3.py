@@ -51,9 +51,7 @@ class WifiSpeakerV3:
     """Main class representing `xiaomi.wifispeaker.v3` device."""
 
     def __init__(self, cookie: dict) -> None:
-        """`cookie` should contain `userId`, `deviceSNProfile`, `sn`, `deviceId` and `serviceToken`.
-
-        `local_ip` is needed for listing directories."""
+        """`cookie` should contain `userId`, `deviceSNProfile`, `sn`, `deviceId` and `serviceToken`. Note that `serviceToken` can change frequently."""
         self._session = Session()
         self._session.headers = {
             "User-Agent": "MICO/AndroidApp/@SHIP.TO.2A2FE0D7@/2.4.14",
