@@ -165,7 +165,7 @@ class WifiSpeakerV3:
         )
 
     def toggle(self) -> bool:
-        """If playing, then pause; if paused, then play."""
+        """If playing, then pause; if paused, then resume."""
         return self.send_raw_command(
             "player_play_operation", '{"action":"toggle","media":"app_android"}'
         )
