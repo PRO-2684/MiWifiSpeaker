@@ -164,6 +164,12 @@ class WifiSpeakerV3:
             "player_play_operation", '{"action":"pause","media":"app_android"}'
         )
 
+    def toggle(self) -> bool:
+        """If playing, then pause; if paused, then play."""
+        return self.send_raw_command(
+            "player_play_operation", '{"action":"toggle","media":"app_android"}'
+        )
+
     def next_song(self) -> bool:
         """Go to the next song."""
         return self.send_raw_command(
