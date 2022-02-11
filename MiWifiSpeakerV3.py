@@ -63,6 +63,7 @@ class WifiSpeakerV3:
         }
         self._session.cookies.update(cookie)
         self.device_id = cookie["deviceId"]
+
     def _post(self, *args, **kwargs):
         flag = False
         for _ in range(RETRY):
@@ -72,8 +73,22 @@ class WifiSpeakerV3:
                 pass
             finally:
                 flag = True
-        assert flag, f'Post failed after {RETRY} retries.'
+        assert flag, f"Post failed after {RETRY} retries."
         return r
+
+    def send_raw_command(self, method: str, message: str) -> bool:
+        r = self._post(
+            URL,
+            params={
+                "deviceId": self.device_id,
+                "path": "mediaplayer",
+                "method": method,
+                "message": message,
+                "requestId": generate_request_id(),
+            },
+        ).json()
+        return r["code"] == 0 and r["data"]["code"] == 0
+
     @property
     def status(self) -> WifiSpeakerV3Status:
         """Get current status."""
@@ -143,121 +158,39 @@ class WifiSpeakerV3:
 
     def pause(self) -> bool:
         """Pause the song currently playing."""
-        r = self._post(
-            URL,
-            params={
-                "deviceId": self.device_id,
-                "path": "mediaplayer",
-                "method": "player_play_operation",
-                "message": '{"action":"pause","media":"app_android"}',
-                "requestId": generate_request_id(),
-            },
-        ).json()
-        return r["code"] == 0 and r["data"]["code"] == 0
+        return self.send_raw_command('player_play_operation', '{"action":"pause","media":"app_android"}')
 
     def next_song(self) -> bool:
         """Go to the next song."""
-        r = self._post(
-            URL,
-            params={
-                "deviceId": self.device_id,
-                "path": "mediaplayer",
-                "method": "player_play_operation",
-                "message": '{"action":"next","media":"app_android"}',
-                "requestId": generate_request_id(),
-            },
-        ).json()
-        return r["code"] == 0 and r["data"]["code"] == 0
-    
+        return self.send_raw_command("player_play_operation", '{"action":"next","media":"app_android"}')
+
     def prev_song(self) -> bool:
         """Go to the previous song."""
-        r = self._post(
-            URL,
-            params={
-                "deviceId": self.device_id,
-                "path": "mediaplayer",
-                "method": "player_play_operation",
-                "message": '{"action":"prev","media":"app_android"}',
-                "requestId": generate_request_id(),
-            },
-        ).json()
-        return r["code"] == 0 and r["data"]["code"] == 0
+        return self.send_raw_command("player_play_operation",'{"action":"prev","media":"app_android"}')
 
     def set_volume(self, volume: int) -> bool:
-        """Set device volume. `volumn` should be between 1 and 100.  
+        """Set device volume. `volumn` should be between 1 and 100.
         Unit: percentage(%)."""
         assert 1 <= volume <= 100, "Volume should be between 1 and 100."
-        r = self._post(
-            URL,
-            params={
-                "deviceId": self.device_id,
-                "path": "mediaplayer",
-                "method": "player_set_volume",
-                "message": f'{{"volume":{volume},"media":"app_android"}}',
-                "requestId": generate_request_id(),
-            },
-        ).json()
-        return r["code"] == 0 and r["data"]["code"] == 0
+        return self.send_raw_command("player_set_volume", f'{{"volume":{volume},"media":"app_android"}}')
 
     def set_position(self, position: int) -> bool:
-        """Set song position.  
+        """Set song position.
         Unit: milliseconds(ms)."""
-        status = self.status
-        assert (
-            position >= 0 and position <= status.duration
-        ), f"Position must be between 0 and duration({status.duration})."
-        r = self._post(
-            URL,
-            params={
-                "deviceId": self.device_id,
-                "path": "mediaplayer",
-                "method": "player_set_positon", # They seemed to have made a spelling mistake...
-                "message": f'{{"position":{position},"media":"app_android"}}',
-                "requestId": generate_request_id(),
-            },
-        ).json()
-        return r["code"] == 0 and r["data"]["code"] == 0
+        assert position >= 0, f"Position must be positive."
+        # They seemed to have made a spelling mistake...
+        return self.send_raw_command("player_set_positon",f'{{"position":{position},"media":"app_android"}}')
 
-    def set_loop_type(self, loop_type: Union[LoopType, int]) -> bool:
+    def set_loop_type(self, loop_type: LoopType) -> bool:
         """Set loop type."""
-        r = self._post(
-            URL,
-            params={
-                "deviceId": self.device_id,
-                "path": "mediaplayer",
-                "method": "player_set_loop",
-                "message": f'{{"media":"app_android","type":{loop_type.value if type(loop_type) == LoopType else loop_type}}}',
-                "requestId": generate_request_id(),
-            },
-        ).json()
-        return r["code"] == 0 and r["data"]["code"] == 0
+        return self.send_raw_command("player_set_loop", f'{{"media":"app_android","type":{loop_type.value}}}')
 
     def set_countdown(self, seconds: int) -> bool:
-        """After `seconds`, pause the music. If `seconds == 0`, cancel the timer.  
+        """After `seconds`, pause the music. If `seconds == 0`, cancel the timer.
         Unit: seconds(s)."""
         if seconds > 0:
-            r = self._post(
-                URL,
-                params={
-                    "deviceId": self.device_id,
-                    "path": "mediaplayer",
-                    "method": "player_set_shutdown_timer",
-                    "message": f'{{"action":"pause_later","second":{seconds % 60},"minute":{seconds % 3600 // 60},"hour":{seconds // 3600}}}',
-                    "requestId": generate_request_id(),
-                },
-            ).json()
-            return r["code"] == 0 and r["data"]["code"] == 0
+            return self.send_raw_command("player_set_shutdown_timer", f'{{"action":"pause_later","second":{seconds % 60},"minute":{seconds % 3600 // 60},"hour":{seconds // 3600}}}')
         elif seconds == 0:
-            r = self._post(
-                URL,
-                params={
-                    "deviceId": self.device_id,
-                    "path": "mediaplayer",
-                    "method": "player_set_shutdown_timer",
-                    "message": '{{"action":"cancel_ending"}}',
-                    "requestId": generate_request_id(),
-                },
-            ).json()
-            return r["code"] == 0 and r["data"]["code"] == 0
+            return self.send_raw_command("player_set_shutdown_timer", '{"action":"cancel_ending"}')
         else:
-            return False
+            raise ValueError('Countdown time should be positive!')
