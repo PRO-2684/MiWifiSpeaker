@@ -125,36 +125,21 @@ class WifiSpeakerV3:
         )
 
     def play(self, local_path: str = "") -> bool:
-        """Plays the given song at `local_path`. If `local_path` is empty, the song previously played is resumed."""
+        """Plays the given song/folder at `local_path`. If `local_path` is empty, the song previously paused is resumed."""
         if not local_path:
-            r = self._post(
-                URL,
-                params={
-                    "deviceId": self.device_id,
-                    "path": "mediaplayer",
-                    "method": "player_play_operation",
-                    "message": '{"action":"play","media":"app_android"}',
-                    "requestId": generate_request_id(),
-                },
-            ).json()
-            return r["code"] == 0 and r["data"]["code"] == 0
+            return self.send_raw_command(
+                "player_play_operation", '{"action":"play","media":"app_android"}'
+            )
         local_path = local_path.replace("\\", "/")
         local_path = local_path.replace("//", "/")
         if local_path.startswith("./"):
             local_path = local_path[1:]
         elif not local_path.startswith("/"):
             local_path = "/" + local_path
-        r = self._post(
-            URL,
-            params={
-                "deviceId": self.device_id,
-                "path": "mediaplayer",
-                "method": "player_play_filepath",
-                "message": f'{{"name":"media","path":"{local_path}","nameBase64":"bWVkaWE=","pathBase64":"{b64encode(local_path.encode()).decode()}"}}',
-                "requestId": generate_request_id(),
-            },
-        ).json()
-        return r["code"] == 0 and r["data"]["code"] == 0
+        return self.send_raw_command(
+            "player_play_filepath",
+            f'{{"name":"media","path":"{local_path}","nameBase64":"bWVkaWE=","pathBase64":"{b64encode(local_path.encode()).decode()}"}}',
+        )
 
     def pause(self) -> bool:
         """Pause the song currently playing."""
