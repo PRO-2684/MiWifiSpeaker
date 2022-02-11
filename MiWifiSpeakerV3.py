@@ -155,6 +155,34 @@ class WifiSpeakerV3:
         ).json()
         return r["code"] == 0 and r["data"]["code"] == 0
 
+    def next_song(self) -> bool:
+        """Go to the next song."""
+        r = self._post(
+            URL,
+            params={
+                "deviceId": self.device_id,
+                "path": "mediaplayer",
+                "method": "player_play_operation",
+                "message": '{"action":"next","media":"app_android"}',
+                "requestId": generate_request_id(),
+            },
+        ).json()
+        return r["code"] == 0 and r["data"]["code"] == 0
+    
+    def prev_song(self) -> bool:
+        """Go to the previous song."""
+        r = self._post(
+            URL,
+            params={
+                "deviceId": self.device_id,
+                "path": "mediaplayer",
+                "method": "player_play_operation",
+                "message": '{"action":"prev","media":"app_android"}',
+                "requestId": generate_request_id(),
+            },
+        ).json()
+        return r["code"] == 0 and r["data"]["code"] == 0
+
     def set_volume(self, volume: int) -> bool:
         """Set device volume. `volumn` should be between 1 and 100.  
         Unit: percentage(%)."""
@@ -183,8 +211,7 @@ class WifiSpeakerV3:
             params={
                 "deviceId": self.device_id,
                 "path": "mediaplayer",
-                # "method": "player_set_position",
-                "method": "player_set_positon",  # ?????
+                "method": "player_set_positon", # They seemed to have made a spelling mistake...
                 "message": f'{{"position":{position},"media":"app_android"}}',
                 "requestId": generate_request_id(),
             },
