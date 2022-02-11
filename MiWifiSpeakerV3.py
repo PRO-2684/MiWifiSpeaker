@@ -4,14 +4,10 @@ from string import ascii_letters, digits
 from json import loads
 from enum import Enum
 from base64 import b64encode
-from typing import Union
 
 URL = "https://api2.mina.mi.com/remote/ubus"
 STRING = ascii_letters + digits
 RETRY = 3
-DEBUG = 0
-if DEBUG:
-    from rich import print_json
 
 
 def generate_request_id():
@@ -37,8 +33,7 @@ class LoopType(Enum):
 class WifiSpeakerV3Status:
     """Main class representing `xiaomi.wifispeaker.v3` status."""
 
-    def __init__(self, info: dict, countdown: dict):
-        self._info = info
+    def __init__(self, info: dict):
         if info['media_type'] != 3:
             raise TypeError('Unsupported media type. Try manually play a song and then restart the script.')
             # Known media types
@@ -49,11 +44,10 @@ class WifiSpeakerV3Status:
         self.volume = info["volume"]
         self.duration = info["play_song_detail"]["duration"]
         self.position = info["play_song_detail"]["position"]
-        self.countdown = countdown["remain_time"] if countdown["type"] == 1 else 0
         self.song_path = info["play_song_detail"]["title"][20:]
 
     def __str__(self):
-        return f'<{self.__class__.__name__}: play_status={self.play_status} loop_type={self.loop_type} volumn={self.volume}% duration={self.duration}ms position={self.position}ms countdown={self.countdown}s song_path="{self.song_path}">'
+        return f'<{self.__class__.__name__}: play_status={self.play_status} loop_type={self.loop_type} volumn={self.volume}% duration={self.duration}ms position={self.position}ms song_path="{self.song_path}">'
 
 
 class WifiSpeakerV3:
@@ -82,6 +76,8 @@ class WifiSpeakerV3:
             finally:
                 flag = True
         assert flag, f"Post failed after {RETRY} retries."
+        if r.status_code == 401:
+            raise PermissionError('Cookie outdated!')
         return r
 
     def send_raw_command(self, method: str, message: str) -> bool:
@@ -95,9 +91,6 @@ class WifiSpeakerV3:
                 "requestId": generate_request_id(),
             },
         ).json()
-        if DEBUG:
-            print(method, message)
-            print_json(data=r)
         return r["code"] == 0 and r["data"]["code"] == 0
 
     @property
@@ -114,12 +107,17 @@ class WifiSpeakerV3:
             },
         )
         data = r.json()
-        if DEBUG:
-            print('self.status, #1')
-            print_json(data=data)
         assert data["code"] == 0 and data["data"]["code"] == 0, (
             "Failed to fetch device status. Response: " + r.text
         )
+        return WifiSpeakerV3Status(
+            loads(data["data"]["info"])
+        )
+
+    @property
+    def countdown(self) -> int:
+        """Get countdown timer, 0 if none.  
+        Unit: milliseconds(ms)."""
         r = self._post(
             URL,
             params={
@@ -131,15 +129,11 @@ class WifiSpeakerV3:
             },
         )
         countdown = r.json()
-        if DEBUG:
-            print('self.status, #2')
-            print_json(data=countdown)
         assert countdown["code"] == 0 and countdown["data"]["code"] == 0, (
             "Failed to fetch countdown status. Response: " + r.text
         )
-        return WifiSpeakerV3Status(
-            loads(data["data"]["info"]), loads(countdown["data"]["info"])
-        )
+        countdown = countdown['data']['info']
+        return countdown['remain_time'] if countdown['type'] else 0
 
     def play(self, local_path: str = "") -> bool:
         """Plays the given song/folder at `local_path`. If `local_path` is empty, the song previously paused is resumed."""
