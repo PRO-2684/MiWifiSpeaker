@@ -39,6 +39,8 @@ class WifiSpeakerV3Status:
 
     def __init__(self, info: dict, countdown: dict):
         self._info = info
+        if info['media_type'] != 3:
+            raise TypeError('Unsupported media type. Try manually play a song and then restart the script.')
         self.play_status = PlayStatus(info["status"])
         self.loop_type = LoopType(info["loop_type"])
         self.volume = info["volume"]
