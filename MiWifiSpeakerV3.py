@@ -41,6 +41,9 @@ class WifiSpeakerV3Status:
         self._info = info
         if info['media_type'] != 3:
             raise TypeError('Unsupported media type. Try manually play a song and then restart the script.')
+            # Known media types
+            # 3: music
+            # 13: video
         self.play_status = PlayStatus(info["status"])
         self.loop_type = LoopType(info["loop_type"])
         self.volume = info["volume"]
