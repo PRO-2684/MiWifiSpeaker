@@ -9,6 +9,9 @@ from typing import Union
 URL = "https://api2.mina.mi.com/remote/ubus"
 STRING = ascii_letters + digits
 RETRY = 3
+DEBUG = 0
+if DEBUG:
+    from rich import print_json
 
 
 def generate_request_id():
@@ -19,7 +22,7 @@ def generate_request_id():
 
 
 class PlayStatus(Enum):
-    # Unknown = 0
+    Stopped = 0
     Playing = 1
     Paused = 2
 
@@ -87,6 +90,9 @@ class WifiSpeakerV3:
                 "requestId": generate_request_id(),
             },
         ).json()
+        if DEBUG:
+            print(method, message)
+            print_json(data=r)
         return r["code"] == 0 and r["data"]["code"] == 0
 
     @property
@@ -103,6 +109,9 @@ class WifiSpeakerV3:
             },
         )
         data = r.json()
+        if DEBUG:
+            print('self.status, #1')
+            print_json(data=data)
         assert data["code"] == 0 and data["data"]["code"] == 0, (
             "Failed to fetch device status. Response: " + r.text
         )
@@ -117,6 +126,9 @@ class WifiSpeakerV3:
             },
         )
         countdown = r.json()
+        if DEBUG:
+            print('self.status, #2')
+            print_json(data=countdown)
         assert countdown["code"] == 0 and countdown["data"]["code"] == 0, (
             "Failed to fetch countdown status. Response: " + r.text
         )
