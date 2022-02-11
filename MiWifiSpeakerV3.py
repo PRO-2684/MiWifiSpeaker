@@ -158,39 +158,56 @@ class WifiSpeakerV3:
 
     def pause(self) -> bool:
         """Pause the song currently playing."""
-        return self.send_raw_command('player_play_operation', '{"action":"pause","media":"app_android"}')
+        return self.send_raw_command(
+            "player_play_operation", '{"action":"pause","media":"app_android"}'
+        )
 
     def next_song(self) -> bool:
         """Go to the next song."""
-        return self.send_raw_command("player_play_operation", '{"action":"next","media":"app_android"}')
+        return self.send_raw_command(
+            "player_play_operation", '{"action":"next","media":"app_android"}'
+        )
 
     def prev_song(self) -> bool:
         """Go to the previous song."""
-        return self.send_raw_command("player_play_operation",'{"action":"prev","media":"app_android"}')
+        return self.send_raw_command(
+            "player_play_operation", '{"action":"prev","media":"app_android"}'
+        )
 
     def set_volume(self, volume: int) -> bool:
         """Set device volume. `volumn` should be between 1 and 100.
         Unit: percentage(%)."""
         assert 1 <= volume <= 100, "Volume should be between 1 and 100."
-        return self.send_raw_command("player_set_volume", f'{{"volume":{volume},"media":"app_android"}}')
+        return self.send_raw_command(
+            "player_set_volume", f'{{"volume":{volume},"media":"app_android"}}'
+        )
 
     def set_position(self, position: int) -> bool:
         """Set song position.
         Unit: milliseconds(ms)."""
         assert position >= 0, f"Position must be positive."
         # They seemed to have made a spelling mistake...
-        return self.send_raw_command("player_set_positon",f'{{"position":{position},"media":"app_android"}}')
+        return self.send_raw_command(
+            "player_set_positon", f'{{"position":{position},"media":"app_android"}}'
+        )
 
     def set_loop_type(self, loop_type: LoopType) -> bool:
         """Set loop type."""
-        return self.send_raw_command("player_set_loop", f'{{"media":"app_android","type":{loop_type.value}}}')
+        return self.send_raw_command(
+            "player_set_loop", f'{{"media":"app_android","type":{loop_type.value}}}'
+        )
 
     def set_countdown(self, seconds: int) -> bool:
         """After `seconds`, pause the music. If `seconds == 0`, cancel the timer.
         Unit: seconds(s)."""
         if seconds > 0:
-            return self.send_raw_command("player_set_shutdown_timer", f'{{"action":"pause_later","second":{seconds % 60},"minute":{seconds % 3600 // 60},"hour":{seconds // 3600}}}')
+            return self.send_raw_command(
+                "player_set_shutdown_timer",
+                f'{{"action":"pause_later","second":{seconds % 60},"minute":{seconds % 3600 // 60},"hour":{seconds // 3600}}}',
+            )
         elif seconds == 0:
-            return self.send_raw_command("player_set_shutdown_timer", '{"action":"cancel_ending"}')
+            return self.send_raw_command(
+                "player_set_shutdown_timer", '{"action":"cancel_ending"}'
+            )
         else:
-            raise ValueError('Countdown time should be positive!')
+            raise ValueError("Countdown time should be positive!")
