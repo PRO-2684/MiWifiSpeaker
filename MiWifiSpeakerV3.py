@@ -81,13 +81,25 @@ class WifiSpeakerV3:
             assert r['code'] == 0, 'Fetching device list failed!'
             device_list = r['data']
             if not sn:
-                self.device_id = device_list[0]['deviceID']
+                device = device_list[0]
+                self.device_id = device['deviceID']
+                sn = device['serialNumber']
             else:
                 for d in device_list:
                     if d['serialNumber'] == sn:
+                        device = d
                         self.device_id = d['deviceID']
                         break
                 assert self.device_id, f'Device with sn {sn} not found!'
+            cookie = {
+                'userId': user_id,
+                'deviceSNProfile': device['deviceSNProfile'],
+                'sn': sn,
+                'deviceId': self.device_id,
+                'serviceToken': self.cookie.get('serviceToken'),
+            }
+            self.cookie.clear()
+            self.cookie.update(cookie)
             self.logined = True
 
 
