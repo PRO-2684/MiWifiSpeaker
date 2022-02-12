@@ -182,6 +182,11 @@ class WifiSpeakerV3:
         countdown = countdown['data']['info']
         return countdown['remain_time'] if countdown['type'] else 0
 
+    @property
+    def cookie(self):
+        """Returns current cookie."""
+        return self._session.cookies
+
     def play(self, local_path: str = "") -> bool:
         """Plays the given song/folder at `local_path`. If `local_path` is empty, the song previously paused is resumed."""
         if not local_path:
