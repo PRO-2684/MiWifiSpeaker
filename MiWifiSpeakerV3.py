@@ -48,9 +48,10 @@ class WifiSpeakerV3Status:
         self.duration = info["play_song_detail"]["duration"]
         self.position = info["play_song_detail"]["position"]
         self.song_path = info["play_song_detail"]["title"][20:]
+        self.playlist = [song["title"][20:] for song in info["extra_track_list"]]
 
     def __str__(self):
-        return f'<{self.__class__.__name__}: play_status={self.play_status} loop_type={self.loop_type} volumn={self.volume}% duration={self.duration}ms position={self.position}ms song_path="{self.song_path}">'
+        return f'<{self.__class__.__name__}: play_status={self.play_status} loop_type={self.loop_type} volumn={self.volume}% duration={self.duration}ms position={self.position}ms song_path="{self.song_path}" playlist={self.playlist}>'
 
 
 class WifiSpeakerV3:
