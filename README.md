@@ -62,4 +62,4 @@ No documentations yet. Please refer to `demo.py`.
 Noting here yet.
 ## 🗒️ Todo
 * [x] Add `set_loop_type`.
-* [ ] Add playlist.
+* [x] Add playlist.
